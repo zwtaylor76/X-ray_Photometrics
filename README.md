@@ -49,7 +49,7 @@ In radiography, the X-ray magnification arises from the X-ray divergence and sam
 
 ## Implementation of TXM using CRLs
 
-As mentioned previously, the TXM assumed in this work is based on compound refractive lenses (CRLs) and uses the results of the ray-transfer matrix formalism described in Simons et al. (2017): doi:10.1107/S160057751602049X.
+As mentioned previously, the TXM assumed in this work is based on compound refractive lenses (CRLs) and uses the results of the ray-transfer matrix formalism described in Simons et al. (2017).
 
 In Simons et al., all the microscope parameters of interest such as the magnification are functions of the microscope geometry and the microscope geometry, point spread function (PSF), etc. are in-turn functionally dependent on the magnification. Since neither the microscope geometry nor the magnification are known *a priori*, this code uses numerical root-finding methods to solve for $M$ in Eq. 21 of Simons et al. Once the magnification is calculated from the availabile microscope length and CRL properties, the microscope geometry and imaging condition (sample-to-lens and lens-to-detector distances) are calculated using Eq. 18 and 19 of Simons et al.
 
@@ -57,8 +57,23 @@ Valid CRL materials are beryllium, diamond, aluminum, silicon and germanium, tho
 
 ## Implementation of Bragg Magnifiers
 
-The magnification resulting from a Bragg magnifier, which uses diffraction from an asymmetrically cut crystal to expand the beam, is described in Vagovic et al. (2011): doi:10.1107/S090904951102989X as well as many other works.
+The magnification resulting from a Bragg magnifier, which uses diffraction from an asymmetrically cut crystal to expand the beam, is described in Vagovic et al. (2011) as well as many other works.
 
 The term for magnification is based on Eq. 1 of Vagovic et al. where the refractive corrections $\delta_{i,h}^{1,2}$ are neglected and most important for very glancing angles. The total external reflection angle is calculated and can be used to place bounds on the maximal magnification. The acceptance angle / bandwidth of the diffractive crystal is also calculable, but currently not integrated into estimating fluence from the source spectrum.
 
 Valid Bragg magnifier crystals in this code are beryllium, diamond, aluminum, silicon and germanium, though Bragg magnifiers are almost always made from silicon or germanium.
+
+## References
+
+[1] Simons 2017, "Simulating and optimizing compound refractive lens-based X-ray microscopes" doi:10.1107/S160057751602049X
+
+[2] Henke 1993, "X-ray interactions: photoabsorption, scattering, transmission, and reflection at E=50-30000 eV, Z=1-92"
+  - CXRO: https://henke.lbl.gov/optical_constants/
+
+[3] Chantler 1997, "Detailed Tabulation of Atomic Form Factors, Photoelectric Absorption and Scattering Cross Section, and Mass Attenuation Coefficients for Z = 1-92 from E = 1-10 eV to E = 0.4-1.0 MeV" doi:10.18434/T4HS32
+  - NIST: https://physics.nist.gov/PhysRefData/FFast/html/form.html
+
+[4] Vagovic 2011, "In-line Bragg magnifier based on V-shaped germanium crystals" doi:10.1107/S090904951102989X
+
+[5] Spal 2001, "Submicron resolution hard x-ray holography with asymmetric bragg diffraction microscope" doi:10.1103/PhysRevLett.86.3044
+
