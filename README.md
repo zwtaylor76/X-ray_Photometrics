@@ -3,6 +3,7 @@
 These packages are meant to provide the tools necessary to estimate the performance of X-ray microscopes for radiography and transmission X-ray microscopy (TXM). They provide a Python implementation for two primary applications:
 * Calculating the magnification and imaging geometry for X-ray microscopes using compound refractive lenses (CRL), based on Simons et al. (2017): doi:10.1107/S160057751602049X
 * Transmission through complex media based on data from the CXRO and NIST databases: https://henke.lbl.gov/optical_constants/ and https://physics.nist.gov/PhysRefData/FFast/html/form.html
+
 Note, some basic functionality is included to accomodate calculating the magnification of Bragg-magnifier based microscopes based on Vagovic et al. (2011): doi:10.1107/S090904951102989X
 
 For both of these applications, the calculations are built on ray-optical assumptions with purely attenuation-based contrast mechanisms. Beer-Lambert's law for a continuously varying medium is given by
