@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
-datasetsFolder = 'D:/OneDrive/Documents/Stanford Stuff/Lab/Dresselhaus-Marais/Custom Python Scripts/Photometrics/Datasets/'
+datasetsFolder = 'Datasets/'
 
 sourceList = {'CXRO': [0.2, 30], #keV, um
               'NIST':[2, 433], #keV, cm-1
