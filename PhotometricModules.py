@@ -744,7 +744,7 @@ class Experiment():
         self.source = source
         
         # rename to 'self.precalculations' one day
-        self.registerPreCalculations = {}
+        self.precalculations = {}
         
         # Verify that the energy ranges from the samples == those from detector scintillators
         # and are within the bounds of those from the source spectrum
@@ -772,27 +772,27 @@ class Experiment():
                 
                 if sourceEnergy is not None:
                     self.energyRanges[(sampleName, detectorName)] = sourceEnergy
-                    self.registerPreCalculations[(sampleName, detectorName)] = sourceEnergy
+                    self.precalculations[(sampleName, detectorName)] = sourceEnergy
                 else:
                     if detectorEnergy is not None:
                         self.energyRanges[(sampleName, detectorName)] = detectorEnergy
-                        self.registerPreCalculations[(sampleName, detectorName)] = detectorEnergy
+                        self.precalculations[(sampleName, detectorName)] = detectorEnergy
                     else:
                         self.energyRanges[(sampleName, detectorName)] = sampleEnergy
-                        self.registerPreCalculations[(sampleName, detectorName)] = sampleEnergy
+                        self.precalculations[(sampleName, detectorName)] = sampleEnergy
     
     def precalculate(self):
         # needs to loop through samples and detectors
         for sampleName, sample in self.samples.items():
             for detectorName, detector in self.detectors.items():
                 # Calculate flux densities at sample and image plane
-                self.registerPreCalculations[(sampleName, detectorName)] = self.calculate_fluxDensities(sampleName)
+                self.precalculations[(sampleName, detectorName)] = self.calculate_fluxDensities(sampleName)
                 # Calculate flux densities at detector
-                self.registerPreCalculations[(sampleName, detectorName)].update(self.calculate_photonCounts(sampleName, detectorName))
+                self.precalculations[(sampleName, detectorName)].update(self.calculate_photonCounts(sampleName, detectorName))
                 # Calculate resolution and magnification at detector
-                self.registerPreCalculations[(sampleName, detectorName)].update(self.calculate_resolutionMagnification(sampleName, detectorName))
+                self.precalculations[(sampleName, detectorName)].update(self.calculate_resolutionMagnification(sampleName, detectorName))
                 # Calculate beam and detector overlap
-                self.registerPreCalculations[(sampleName, detectorName)].update(self.calculate_beamCameraOverlap(sampleName, detectorName))
+                self.precalculations[(sampleName, detectorName)].update(self.calculate_beamCameraOverlap(sampleName, detectorName))
                
     
     def calculate_fluxDensities(self, sampleName : str):
@@ -886,7 +886,7 @@ class Experiment():
                 ##################################################################
                 pass
             else:
-                fluxDensity_atImage = self.registerPreCalculations[(sampleName, detectorName)]['fluxDensity_atImage']
+                fluxDensity_atImage = self.precalculations[(sampleName, detectorName)]['fluxDensity_atImage']
                 pixelArea = self.detectors[detectorName].pixelSize**2
                 exposureTime = self.detectors[detectorName].exposureTime
                 photons_per_pixel_perEnergy = lambda e : pixelArea * fluxDensity_atImage(e) * exposureTime
@@ -936,7 +936,7 @@ class Experiment():
                 ##################################################################
                 pass
             else:
-                fluxDensity_atImage = self.registerPreCalculations[(sampleName, detectorName)]['fluxDensity_atImage']
+                fluxDensity_atImage = self.precalculations[(sampleName, detectorName)]['fluxDensity_atImage']
                 pixelArea = self.detectors[detectorName].pixelSize**2
                 photons_per_pixel_perEnergy = lambda e : pixelArea * fluxDensity_atImage(e)
                 
@@ -997,7 +997,7 @@ class Experiment():
                 ##################################################################
                 pass
             else:
-                fluxDensity_atImage = self.registerPreCalculations[(sampleName, detectorName)]['fluxDensity_atImage'] #lambda e, e_, hkl, miscut
+                fluxDensity_atImage = self.precalculations[(sampleName, detectorName)]['fluxDensity_atImage'] #lambda e, e_, hkl, miscut
                 pixelArea = self.detectors[detectorName].pixelSize**2
                 photons_per_pixel_perEnergy = lambda e, e_, hkl, miscut : pixelArea * fluxDensity_atImage(e, e_, hkl, miscut)
                 
@@ -1040,8 +1040,8 @@ class Experiment():
         
     def calculate_resolutionMagnification(self, sampleName : str, detectorName : str):
         if self.microscope.microscopeType == 'radiograph':
-            spotSize_atSample = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atSample']
-            spotSize_atImage = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage']
+            spotSize_atSample = self.precalculations[(sampleName, detectorName)]['spotSize_atSample']
+            spotSize_atImage = self.precalculations[(sampleName, detectorName)]['spotSize_atImage']
             
             if self.source.spotShape == 'circle':
                 xray_mag = spotSize_atImage / (spotSize_atSample + 1e-5)
@@ -1113,7 +1113,7 @@ class Experiment():
     def calculate_beamCameraOverlap(self, sampleName : str, detectorName : str):
         if self.microscope.microscopeType == 'radiograph':
             if self.source.spotShape == 'circle':
-                db = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage']
+                db = self.precalculations[(sampleName, detectorName)]['spotSize_atImage']
                 
                 if not self.detectors[detectorName].direct:
                     db *= self.detectors[detectorName].calculateOpticalMagnification()
@@ -1149,7 +1149,7 @@ class Experiment():
                 '''
                     
             elif self.source.spotShape == 'rectangle' or self.source.spotShape == 'custom':
-                hb, wb = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage']
+                hb, wb = self.precalculations[(sampleName, detectorName)]['spotSize_atImage']
                 hc, wc = self.detectors[detectorName].pixelCount
                 
                 if not self.detectors[detectorName].direct:
@@ -1170,7 +1170,7 @@ class Experiment():
         
         elif self.microscope.microscopeType == 'CRL':
             if self.source.spotShape == 'circle':
-                db_ = lambda e : self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage'](e)
+                db_ = lambda e : self.precalculations[(sampleName, detectorName)]['spotSize_atImage'](e)
                 
                 if not self.detectors[detectorName].direct:
                     db = lambda e : db_(e)*self.detectors[detectorName].calculateOpticalMagnification()
@@ -1181,7 +1181,7 @@ class Experiment():
                 beam_captured_by_camera_AND_camera_filled_by_beam = lambda e : circle_overlap_onto_rectangle(db(e), hc, wc)
                     
             elif self.source.spotShape == 'rectangle' or self.source.spotShape == 'custom':
-                hb_, wb_ = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage']
+                hb_, wb_ = self.precalculations[(sampleName, detectorName)]['spotSize_atImage']
                 hc, wc = self.detectors[detectorName].pixelCount
                 
                 if not self.detectors[detectorName].direct:
@@ -1201,7 +1201,7 @@ class Experiment():
         
         elif self.microscope.microscopeType == 'bragg':
             if self.source.spotShape == 'circle':
-                db_ = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage'] #(e, hkl, miscut)
+                db_ = self.precalculations[(sampleName, detectorName)]['spotSize_atImage'] #(e, hkl, miscut)
                 
                 if not self.detectors[detectorName].direct:
                     if callable(db_):
@@ -1215,7 +1215,7 @@ class Experiment():
                 beam_captured_by_camera_AND_camera_filled_by_beam = lambda e, hkl, miscut : circle_overlap_onto_rectangle(db(e, hkl, miscut), hc, wc)
                     
             elif self.source.spotShape == 'rectangle' or self.source.spotShape == 'custom':
-                hb_, wb_ = self.registerPreCalculations[(sampleName, detectorName)]['spotSize_atImage']
+                hb_, wb_ = self.precalculations[(sampleName, detectorName)]['spotSize_atImage']
                 hc, wc = self.detectors[detectorName].pixelCount
                 
                 if not self.detectors[detectorName].direct:
