@@ -55,6 +55,8 @@ class Sample():
     # from CXRO and NIST (stored locally). This file returns transmission
     # functions vs energy and scalar thickness.
     #
+    valid_materials = FetchMaterials.validMaterials
+
     def __init__(self, materialList: List[str], 
                  energyRange: Tuple[float, float], 
                  densityScaling : List[float] = None,
@@ -445,14 +447,22 @@ class Source():
         o = self.dilation(length)
         if self.spotShape == 'circle':
             area = np.pi * (self.spotSize/2 + o)**2
-            return lambda e : self.spectrum[0](e) / area
+            if type(self.spectrum) is tuple:
+                return lambda e : self.spectrum[0](e) / area
+            else:
+                return lambda e : self.spectrum(e) / area
         elif self.spotShape == 'rectangle':
             area = np.abs((self.spotSize[0] + 2*o)*(self.spotSize[1] + 2*o))
-            #return lambda e : self.spectrum[0](e) / area
-            return lambda e : self.spectrum(e) / area
+            if type(self.spectrum) is tuple:
+                return lambda e : self.spectrum[0](e) / area
+            else:
+                return lambda e : self.spectrum(e) / area
         elif self.spotShape == 'custom':
             area = np.abs((self.spotSize + 2*o)*(self.spotSize + 2*o))
-            return lambda e : self.spectrum[0](e) / area * self.shape
+            if type(self.spectrum) is tuple:
+                return lambda e : self.spectrum[0](e) / area * self.shape
+            else:
+                return lambda e : self.spectrum(e) / area * self.shape
         else:
             assert False, "Incorrect beam profile."
        
